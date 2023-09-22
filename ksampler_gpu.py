@@ -23,7 +23,7 @@ def common_ksampler(model, seed, steps, cfg, sampler_name, scheduler, positive, 
         if "batch_index" in latent:
             batch_index = latent["batch_index"]
 
-        generator = torch.manual_seed(seed)
+        generator = torch.Generator(device=device).manual_seed(seed) 
         for i in range(batch_index):
             noise = torch.randn([1] + list(latent_image.size())[1:], dtype=latent_image.dtype,
                                 layout=latent_image.layout, generator=generator, device=device)
@@ -74,7 +74,7 @@ def common_ksampler(model, seed, steps, cfg, sampler_name, scheduler, positive, 
         negative_copy += [[t] + n[1:]]
 
     models = get_models(positive) + get_models(negative)
-    comfy.model_management.load_controlnet_gpu(models)
+    comfy.model_management.load_models_gpu(models)
 
     if sampler_name in comfy.samplers.KSampler.SAMPLERS:
         sampler = comfy.samplers.KSampler(real_model, steps=steps, device=device, sampler=sampler_name,
